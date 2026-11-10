@@ -1,0 +1,11 @@
+node_modules/
+.npmrc
+.env
+.env.*
+*.log
+*.tgz
+*.zip
+.DS_Store
+Thumbs.db
+/liang-intensity-skin/
+/liquid-glass-demo*.html

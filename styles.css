@@ -1,0 +1,505 @@
+:where(html[data-hlg]) {
+  --lg-intensity: .75;
+}
+
+html[data-hlg] body {
+  --hlg-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --hlg-base: #e3e9f8;
+  --hlg-ink: #141a29;
+  --hlg-ink-secondary: #566077;
+  --hlg-layer: #f8faff;
+  --hlg-glass-tint: 6%;
+  --hlg-edge: rgb(255 255 255 / .72);
+  --hlg-shadow: 0 12px 36px rgb(30 45 100 / .20);
+  --hlg-reading: #f4f6fb;
+  --hlg-code: #e9edf5;
+  --hlg-content-edge: rgb(43 64 112 / .12);
+  --hlg-pill: rgb(255 255 255 / .34);
+  --hlg-pill-hover: rgb(255 255 255 / .50);
+  --hlg-accent: #3b6dff;
+  --hlg-blue: linear-gradient(180deg, #6a9eff, #3862ee);
+  --hlg-user-bubble: #416bea;
+  --hlg-ambient: rgb(104 140 229 / .13);
+}
+
+html[data-hlg] body:is([data-liang-skin="on"][data-liang-stage="5"], [data-ds-dark-theme]:not([data-liang-skin="on"])) {
+  --hlg-base: #080b14;
+  --hlg-ink: #f2f5fc;
+  --hlg-ink-secondary: #b3bfd7;
+  --hlg-layer: #171d2d;
+  --hlg-glass-tint: 4%;
+  --hlg-edge: rgb(227 237 255 / .23);
+  --hlg-shadow: 0 12px 36px rgb(0 0 0 / .45);
+  --hlg-reading: #191f2d;
+  --hlg-code: #101622;
+  --hlg-content-edge: rgb(205 221 255 / .12);
+  --hlg-pill: rgb(228 237 255 / .12);
+  --hlg-pill-hover: rgb(228 237 255 / .22);
+  --hlg-accent: #7ea6ff;
+  --hlg-user-bubble: #3258cb;
+  --hlg-ambient: rgb(103 127 218 / .15);
+}
+
+html[data-hlg] :is([data-hlg-background], [data-hlg-surface]) {
+  --dsw-alias-bg-base: transparent;
+  --dsw-alias-bg-layer-1: var(--hlg-reading);
+  --dsw-alias-bg-layer-2: var(--hlg-layer);
+  --dsw-alias-bg-layer-3: var(--hlg-layer);
+  --dsw-alias-label-primary: var(--hlg-ink);
+  --dsw-alias-label-primary-dimmed: var(--hlg-ink);
+  --dsw-alias-label-secondary: var(--hlg-ink-secondary);
+  --dsw-alias-label-tertiary: var(--hlg-ink-secondary);
+  --dsw-alias-label-caption: var(--hlg-ink-secondary);
+  --dsw-alias-interactive-bg-hover: var(--hlg-pill);
+  --dsw-alias-interactive-bg-active: var(--hlg-pill-hover);
+  --dsw-alias-state-business-primary: var(--hlg-accent);
+  --dsw-specific-sidebar-nav-item-active: var(--hlg-pill-hover);
+  --dsw-specific-selector: var(--hlg-pill);
+  color: var(--hlg-ink);
+}
+
+html[data-hlg] [data-hlg-background] {
+  isolation: isolate;
+  background: var(--hlg-base);
+}
+
+/* Liang still owns this node, its portrait sequence and slider-driven state. */
+html[data-hlg] [data-hlg-background] .liang-skin-backdrop {
+  position: fixed;
+  inset: var(--dsh-windows-titlebar-height, 0px) 0 0;
+  z-index: -1;
+}
+
+/* Fill the sides from the same wallpaper that Liang is displaying. */
+html[data-hlg] [data-hlg-background] .liang-skin-backdrop[data-media="sequence"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--hlg-wallpaper-image, none) center / cover;
+  filter: saturate(.55);
+  opacity: .22;
+}
+
+html[data-hlg] [data-hlg-background]:not(:has(.liang-skin-backdrop[data-media="sequence"] img))::after {
+  content: "";
+  position: absolute;
+  inset: var(--dsh-windows-titlebar-height, 0px) 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 14% 22%, var(--hlg-ambient), transparent 67%);
+}
+
+html[data-hlg] [data-hlg-background] > [class*="_centerCol"],
+html[data-hlg] [data-hlg-background] [data-hlg-chat-shell] {
+  background: transparent;
+}
+
+html[data-hlg] [data-hlg-background] [data-composer-seat] {
+  background: transparent !important;
+  will-change: auto;
+}
+
+html[data-hlg] [data-hlg-background] > [data-hlg-surface="sidebar"] {
+  margin: 14px 0 14px 14px;
+  border: 0;
+  overflow: visible;
+}
+
+html[data-hlg] [data-hlg-background]:not([data-sidebar-drawer]) > [class*="_centerCol"] {
+  margin: 14px;
+  border-radius: 30px;
+}
+
+html[data-hlg] [data-hlg-chat-shell] [class*="_header"]:has(> [class*="_tabs"] [data-conversation-tabs]) {
+  border-bottom: 0;
+  padding: 6px 14px 8px;
+}
+
+@media (min-width: 1080px) {
+  html[data-hlg] [data-hlg-chat-shell] [class*="_header"]:has(> [class*="_tabs"] [data-conversation-tabs]) {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 56px;
+    align-items: center;
+    gap: 12px;
+  }
+
+  html[data-hlg] [data-hlg-chat-shell] [class*="_header"]:has(> [class*="_tabs"] [data-conversation-tabs]) > [class*="_titleRow"] {
+    min-width: 0;
+    flex: 1 1 180px;
+  }
+
+  html[data-hlg] [data-hlg-chat-shell] [class*="_tabs"]:has(> [data-conversation-tabs]) {
+    /* Harness reserves 48px plus 120px per pinned view. The visible pill stays compact. */
+    width: 412px;
+    max-width: 100%;
+    flex: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 0 0 0 auto;
+    padding: 0;
+  }
+}
+
+html[data-hlg] [data-hlg-surface],
+html[data-hlg] [data-hlg-thumb] {
+  --hlg-material: var(--hlg-layer);
+  --hlg-tint: 59%;
+  --hlg-highlight: radial-gradient(230px circle at var(--hlg-x, 30%) var(--hlg-y, 0%), rgb(255 255 255 / var(--hlg-glint, 0)), transparent 68%);
+  background-color: color-mix(in srgb, var(--hlg-material) var(--hlg-tint), transparent);
+  background-image: var(--hlg-highlight);
+  --hlg-surface-shadow: inset 0 0 0 1px var(--hlg-edge), inset 0 1px 0 rgb(255 255 255 / .42),
+    inset 0 -7px 18px rgb(255 255 255 / .07), var(--hlg-shadow);
+  box-shadow: var(--hlg-surface-shadow);
+}
+
+html[data-hlg] [data-hlg-hover] {
+  --hlg-glint: .14;
+}
+
+html[data-hlg] [data-hlg-mode="frost"] {
+  --hlg-tint: 76%;
+  --hlg-surface-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: var(--hlg-surface-filter);
+  backdrop-filter: var(--hlg-surface-filter);
+}
+
+html[data-hlg] [data-hlg-mode="lens"] {
+  --hlg-material: white;
+  --hlg-tint: var(--hlg-glass-tint);
+  --hlg-surface-filter: var(--hlg-user-blur,) var(--hlg-filter) brightness(1.04);
+  -webkit-backdrop-filter: var(--hlg-surface-filter);
+  backdrop-filter: var(--hlg-surface-filter);
+}
+
+html[data-hlg] [data-hlg-mode="flat"] {
+  --hlg-tint: 88%;
+  --hlg-surface-shadow: inset 0 0 0 1px var(--hlg-edge), inset 0 1px 0 rgb(255 255 255 / .22);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-hlg] [data-hlg-surface="composer"] {
+  max-width: 780px;
+  border-radius: 32px;
+  gap: 10px;
+  padding: 13px 12px 8px;
+  transition: translate .5s var(--hlg-spring);
+}
+
+html[data-hlg] [data-hlg-surface="composer"][data-hlg-mode="lens"]:has([data-trigger-menu]),
+html[data-hlg] [data-hlg-surface="sidebar"]:is([data-hlg-mode="lens"], [data-hlg-mode="frost"]) {
+  position: relative;
+  isolation: isolate;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Filtering only the paint layer leaves the native fixed titlebar toggle viewport-relative. */
+html[data-hlg] [data-hlg-surface="composer"][data-hlg-mode="lens"]:has([data-trigger-menu])::before,
+html[data-hlg] [data-hlg-surface="sidebar"]:is([data-hlg-mode="lens"], [data-hlg-mode="frost"])::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  -webkit-backdrop-filter: var(--hlg-surface-filter);
+  backdrop-filter: var(--hlg-surface-filter);
+}
+
+/* Liang's first stages use an important background shorthand on this card. */
+html[data-hlg] body[data-liang-skin="on"] [data-composer-card][data-hlg-surface="composer"] {
+  background-color: color-mix(in srgb, var(--hlg-material) var(--hlg-tint), transparent) !important;
+  background-image: var(--hlg-highlight) !important;
+  box-shadow: var(--hlg-surface-shadow);
+}
+
+html[data-hlg] [data-hlg-surface="sidebar"] {
+  --dsw-specific-sidebar-fill: transparent;
+  border-radius: 30px;
+}
+
+html[data-hlg] [data-hlg-surface="sidebar"] [class*="_root"]:has(> [class*="_logoRow"]) {
+  box-sizing: border-box;
+  width: 100% !important;
+}
+
+html[data-hlg] [data-hlg-surface="sidebar"] [class$="_dragPreview"] {
+  background-color: color-mix(in srgb, var(--hlg-layer) 88%, transparent);
+}
+
+html[data-hlg] [data-hlg-surface="sidebar"] [role="treeitem"][aria-selected="true"] {
+  border-radius: 12px;
+  background-color: var(--hlg-pill-hover);
+  box-shadow: inset 0 0 0 1px var(--hlg-edge);
+}
+
+html[data-hlg] [data-hlg-surface="right"] {
+  --hlg-material: var(--dsw-alias-bg-layer-1, Canvas);
+}
+
+html[data-hlg] [data-hlg-surface="right"] > [class*="_panelBody"],
+html[data-hlg] [data-hlg-surface="right"] :is([data-dockkit-host="dock"], [data-dockkit-empty]) {
+  background-color: transparent;
+}
+
+html[data-hlg] [data-hlg-surface="popover"] {
+  border-radius: 24px;
+}
+
+html[data-hlg] [data-hlg-surface="popover"][data-menu-material] {
+  --dsw-menu-surface-fill: transparent;
+  --dsw-menu-backdrop-filter: none;
+}
+
+html[data-hlg] [data-trigger-menu][data-hlg-mode="lens"] {
+  background-color: color-mix(in srgb, white var(--hlg-glass-tint), transparent);
+}
+
+html[data-hlg] [data-hlg-surface="popover"][role="dialog"]::before {
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-hlg] [data-hlg-surface="tooltip"]:not([data-hlg-mode="lens"]) {
+  --hlg-material: var(--dsw-alias-tooltip-bg, var(--dsw-alias-bg-layer-3, var(--dsw-alias-bg-layer-2, Canvas)));
+  --hlg-tint: 88%;
+}
+
+html[data-hlg] [data-hlg-surface="toast"]:not([data-hlg-mode="lens"]) {
+  --hlg-material: var(--dsw-alias-toast-bg, var(--dsw-alias-bg-layer-3, var(--dsw-alias-bg-layer-2, Canvas)));
+  --hlg-tint: 86%;
+}
+
+html[data-hlg] [data-hlg-surface="dialog"][data-shortcut-modal="settings"] {
+  --dsw-alias-settings-card-fill: color-mix(in srgb, var(--dsw-alias-bg-layer-2, Canvas) 90%, var(--dsw-alias-bg-layer-1, Canvas));
+  --dsw-alias-settings-card-stroke: var(--hlg-edge);
+}
+
+html[data-hlg] .hlg-preferences {
+  display: grid;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+html[data-hlg] .hlg-preference {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) minmax(0, 1fr) 4ch;
+  gap: 12px;
+  align-items: center;
+}
+
+html[data-hlg] .hlg-preference input {
+  min-width: 0;
+  width: 100%;
+  accent-color: var(--hlg-accent);
+}
+
+html[data-hlg] .hlg-preference output {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-hlg] [data-hlg-surface="composer"] [class*="_row"] :is(button[class*="_add"], button[class*="_trigger"], button[aria-haspopup]):not([class*="_primary"]) {
+  min-height: 34px;
+  padding-inline: 12px;
+  background: var(--hlg-pill) !important;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--hlg-edge), inset 0 1px 0 rgb(255 255 255 / .26);
+}
+
+html[data-hlg] [data-hlg-surface="sidebar"] button[class*="_newSession"] {
+  min-height: 40px;
+  border-radius: 14px;
+  background: var(--hlg-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--hlg-edge);
+}
+
+html[data-hlg] [data-hlg-surface="composer"] [class*="_row"] button[class*="_add"] {
+  width: 34px;
+  padding-inline: 0;
+}
+
+html[data-hlg] [data-hlg-surface="composer"] [class*="_row"] :is(button[class*="_add"], button[class*="_trigger"], button[aria-haspopup]):not([class*="_primary"]):hover:not(:disabled),
+html[data-hlg] [data-hlg-surface="sidebar"] button[class*="_newSession"]:hover:not(:disabled) {
+  background: var(--hlg-pill-hover) !important;
+}
+
+html[data-hlg] [data-hlg-surface="composer"] button[class*="_primary"] {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: white !important;
+  background: var(--hlg-blue) !important;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / .68), 0 5px 13px rgb(59 109 255 / .28);
+}
+
+html[data-hlg] [data-hlg-surface="composer"] .liang-effort-control {
+  box-sizing: content-box;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--hlg-pill);
+  box-shadow: inset 0 0 0 1px var(--hlg-edge);
+}
+
+html[data-hlg] :is([data-hlg-surface="composer"], [data-hlg-surface="sidebar"]) :is(button[class*="_add"], button[class*="_trigger"], button[class*="_primary"], button[class*="_newSession"]) {
+  transition: scale .45s var(--hlg-spring), translate .45s var(--hlg-spring), background-color .2s;
+}
+
+html[data-hlg] :is([data-hlg-surface="composer"], [data-hlg-surface="sidebar"]) :is(button[class*="_add"], button[class*="_trigger"], button[class*="_primary"], button[class*="_newSession"]):active:not(:disabled) {
+  scale: .94;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-hlg] [data-hlg-surface="composer"]:hover {
+    translate: 0 -2px;
+  }
+}
+
+html[data-hlg] [data-chat-flow] {
+  --dsw-alias-markdown-code-block: var(--hlg-code);
+  --dsw-alias-markdown-code-block-banner: var(--hlg-code);
+  --dsw-alias-markdown-inline-code: var(--hlg-code);
+}
+
+html[data-hlg] [data-chat-flow] [data-message-bubble] {
+  --dsw-alias-label-primary: white;
+  --dsw-alias-label-secondary: #edf3ff;
+  color: white;
+  background: var(--hlg-user-bubble);
+  border-radius: 22px;
+  box-shadow: none;
+}
+
+html[data-hlg] [data-chat-flow] :is([data-tool], [data-chat-flow-kind="assistant-step"] [class*="_root"]:has(> [class*="_body"])) {
+  background-color: var(--hlg-reading);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px var(--hlg-content-edge);
+  padding: 10px 13px;
+}
+
+html[data-hlg] [data-chat-flow-kind="assistant-step"] [class*="_root"]:has(> [class*="_body"]) {
+  padding: 14px 18px;
+  border-radius: 22px;
+}
+
+html[data-hlg] [data-hlg-track][data-hlg-relative] {
+  position: relative;
+}
+
+html[data-hlg] [data-hlg-track="segments"] {
+  background-color: var(--hlg-pill);
+  border-radius: 999px;
+  touch-action: pan-y;
+  box-shadow: inset 0 0 0 1px var(--hlg-edge);
+}
+
+html[data-hlg] [data-conversation-tabs][data-hlg-track="segments"] {
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  min-height: 42px;
+}
+
+html[data-hlg] [data-conversation-tabs][data-hlg-track="segments"] > [role="tab"] {
+  height: 40px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 999px;
+}
+
+html[data-hlg] [data-conversation-tabs][data-hlg-track="segments"] > [role="tab"]::after {
+  content: none;
+}
+
+html[data-hlg] [data-conversation-tabs][data-hlg-track="segments"] > [aria-selected="true"] {
+  color: var(--hlg-ink);
+}
+
+html[data-hlg] [data-hlg-track="segments"] > [role="tab"] {
+  position: relative;
+  z-index: 3;
+}
+
+html[data-hlg] [data-hlg-track="segments"] > [class*="_indicator"],
+html[data-hlg] [data-hlg-track="switch"] > [class*="_thumb"] {
+  opacity: 0;
+}
+
+html[data-hlg] input[data-hlg-range]::-webkit-slider-thumb {
+  opacity: 0;
+}
+
+html[data-hlg] input[data-hlg-range]::-moz-range-thumb {
+  opacity: 0;
+}
+
+html[data-hlg] [data-hlg-thumb] {
+  position: absolute;
+  inset: 0 auto auto 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 999px;
+  margin: 0;
+  transition: none;
+  --hlg-material: var(--dsw-specific-selector, Canvas);
+  --hlg-tint: 13%;
+  box-shadow: inset 0 0 0 1px var(--hlg-edge), inset 0 1px 0 rgb(255 255 255 / .50), 0 3px 8px rgb(20 28 50 / .13);
+}
+
+/* The centre is the original backdrop. Only the masked rim is composited. */
+html[data-hlg] [data-hlg-thumb][data-hlg-mode="lens"] {
+  --hlg-material: white;
+  --hlg-tint: var(--hlg-glass-tint);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-hlg] [data-hlg-thumb][data-hlg-mode="lens"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--hlg-bezel, 0px);
+  pointer-events: none;
+  -webkit-backdrop-filter: var(--hlg-user-blur,) var(--hlg-filter);
+  backdrop-filter: var(--hlg-user-blur,) var(--hlg-filter);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+html[data-hlg] [data-hlg-thumb][data-hlg-mode="frost"] {
+  --hlg-tint: 52%;
+  -webkit-backdrop-filter: blur(7px) saturate(1.5);
+  backdrop-filter: blur(7px) saturate(1.5);
+}
+
+html[data-hlg] [data-hlg-thumb][data-hlg-mode="flat"] {
+  --hlg-tint: 66%;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-hlg] [data-hlg-surface] {
+    --hlg-tint: 96% !important;
+    background-image: none;
+  }
+  html[data-hlg] [data-hlg-thumb] {
+    --hlg-tint: 92%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-hlg] [data-hlg-surface="composer"],
+  html[data-hlg] :is([data-hlg-surface="composer"], [data-hlg-surface="sidebar"]) :is(button[class*="_add"], button[class*="_trigger"], button[class*="_primary"], button[class*="_newSession"]) {
+    translate: none !important;
+    scale: none !important;
+    transition: none;
+  }
+}
