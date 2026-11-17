@@ -6,7 +6,6 @@ window.__ModuleLoader__.load({
     const PREFERENCE_KEY = 'dsh-liquid-glass.appearance';
     const SETTINGS_LOCALE = 'dsh-liquid-glass-settings';
     const DEFAULT_INTENSITY = 75;
-    const TRIGGER_MENU = '[data-trigger-menu]';
     const SVG = 'http://www.w3.org/2000/svg';
     const SPRING = 'cubic-bezier(.34, 1.56, .64, 1)';
     const CHANNELS = [
@@ -27,11 +26,20 @@ window.__ModuleLoader__.load({
 
     // DSH surface detection uses semantic markers with class fragments for
     // shell and control structures that have no dedicated data marker.
+    const TRIGGER_MENU = '[data-trigger-menu]';
+    const MENU_MATERIAL = '[data-menu-material]';
+    const SHELL_FRAME = '[class*="_frame"]';
+    const SHELL_CENTER = ':scope > [class*="_centerCol"]';
+    const CONVERSATION_CONTENT = '[data-conversation-content]';
+    const CONVERSATION_ROOT = '[class*="_root"]';
+    const RANGE = 'input[type="range"]';
+    const SWITCH = '[role="switch"]';
+    const SWITCH_THUMB = '[class*="_thumb"]';
     const SURFACES = [
       ['composer', '[data-composer-card]', 36, 42, 3],
-      ['sidebar', '[class*="_frame"]:not([data-sidebar-drawer], [data-sidebar-collapsed]) > [class*="_sidebarCol"]:has([class*="_logoRow"])', 34, 40, 4],
+      ['sidebar', SHELL_FRAME + ':not([data-sidebar-drawer], [data-sidebar-collapsed]) > [class*="_sidebarCol"]:has([class*="_logoRow"])', 34, 40, 4],
       ['right', '[data-sidebar-right-panel="push"][data-sidebar-right-open]', 26, 25, 5],
-      ['popover', TRIGGER_MENU + ', [data-menu-material], [role="menu"], [role="listbox"][class*="_panel"], [role="dialog"][class*="_panel"]:not([aria-modal="true"])', 28, 30, 0],
+      ['popover', TRIGGER_MENU + ', ' + MENU_MATERIAL + ', [role="menu"], [role="listbox"][class*="_panel"], [role="dialog"][class*="_panel"]:not([aria-modal="true"])', 28, 30, 0],
       ['dialog', '[role="dialog"][aria-modal="true"]:not([data-shortcut-modal="sidebar"])', 28, 27, 0],
       ['tooltip', '[role="tooltip"]', 12, 10, 2],
       ['toast', '[role="alert"][class*="_toast_"]', 22, 22, 1],
@@ -41,10 +49,10 @@ window.__ModuleLoader__.load({
     const TRACK_SELECTOR = [
       '[role="tablist"]:has(> [class*="_indicator"]):has(> [role="tab"])',
       '[data-conversation-tabs][role="tablist"]:has(> [role="tab"])',
-      '[role="switch"]:has(> [class*="_thumb"])',
-      'input[type="range"]:not(' + LIANG_EFFORT_RANGE + ', [data-hlg-preference])',
+      SWITCH + ':has(> ' + SWITCH_THUMB + ')',
+      RANGE + ':not(' + LIANG_EFFORT_RANGE + ', [data-hlg-preference])',
     ].join(', ');
-    const FRAME_SELECTOR = '[class*="_frame"]:has(> [data-shell-overlay])';
+    const FRAME_SELECTOR = SHELL_FRAME + ':has(> [data-shell-overlay])';
     const CANDIDATE_SELECTOR = [SURFACE_SELECTOR, TRACK_SELECTOR, FRAME_SELECTOR].join(', ');
     const MAX_SURFACE_FILTERS = 4;
     const MAX_THUMB_FILTERS = 4;
@@ -413,7 +421,7 @@ window.__ModuleLoader__.load({
         return { x: center, y: height / 2, w: selected.width + (pressed ? 14 : 2), h: height + (pressed ? 6 : 0) };
       }
       if (type === 'switch') {
-        const native = track.querySelector(':scope > [class*="_thumb"]');
+        const native = track.querySelector(':scope > ' + SWITCH_THUMB);
         const h = native?.offsetHeight || height - 4;
         const w = (native?.offsetWidth || h) + (pressed ? 9 : 3);
         const right = anchor.getAttribute('aria-checked') === 'true';
@@ -563,11 +571,16 @@ window.__ModuleLoader__.load({
         record.el.setAttribute('data-hlg-mode', mode);
       }
 
+      function clearOwnedHighlight(element) {
+        clearHighlight(element);
+        if (highlighted === element) highlighted = null;
+      }
+
       function releaseSurface(record) {
         const { el } = record;
         for (const animation of record.animations ?? []) animation.cancel();
         filters.drop(record);
-        clearHighlight(el);
+        clearOwnedHighlight(el);
         el.removeAttribute('data-hlg-surface');
         el.removeAttribute('data-hlg-floating');
         el.removeAttribute('data-hlg-mode');
@@ -580,6 +593,7 @@ window.__ModuleLoader__.load({
           record.track.releasePointerCapture(record.pointer);
         }
         filters.drop(record);
+        clearOwnedHighlight(record.el);
         record.el.remove();
         record.anchor.removeAttribute('data-hlg-range');
         record.track.removeAttribute('data-hlg-track');
@@ -591,8 +605,8 @@ window.__ModuleLoader__.load({
 
       function setBackground(app) {
         const next = app ?? null;
-        const center = next?.querySelector(':scope > [class*="_centerCol"]');
-        const candidate = center?.querySelector('[data-conversation-content]')?.closest('[class*="_root"]');
+        const center = next?.querySelector(SHELL_CENTER);
+        const candidate = center?.querySelector(CONVERSATION_CONTENT)?.closest(CONVERSATION_ROOT);
         const nextChat = candidate ?? null;
         if (background !== next) {
           background?.removeAttribute('data-hlg-background');
@@ -649,8 +663,8 @@ window.__ModuleLoader__.load({
           const spec = SURFACES.find(([, selector]) => el.matches(selector));
           if (!spec || el.closest(LIANG_EFFORT_CONTROL)) return [];
           // Bare lists inside MenuSurface share its material; nested floating surfaces own theirs.
-          if (el.matches('[role="menu"], [role="listbox"]') && !el.matches('[data-menu-material], ' + TRIGGER_MENU)
-            && el.parentElement?.closest('[data-menu-material]')) return [];
+          if (el.matches('[role="menu"], [role="listbox"]') && !el.matches(MENU_MATERIAL + ', ' + TRIGGER_MENU)
+            && el.parentElement?.closest(MENU_MATERIAL)) return [];
           return [{ el, spec }];
         });
         const panelElements = new Set(panels.map(item => item.el));
@@ -695,7 +709,7 @@ window.__ModuleLoader__.load({
         let thumbFilters = 0;
         for (const el of current) {
           if (!el.matches(TRACK_SELECTOR)) continue;
-          const type = el.matches('input[type="range"]') ? 'range' : el.matches('[role="switch"]') ? 'switch' : 'segments';
+          const type = el.matches(RANGE) ? 'range' : el.matches(SWITCH) ? 'switch' : 'segments';
           const track = type === 'range' ? el.parentElement : el;
           if (!track || !track.clientWidth || !track.clientHeight || usedTracks.has(track)) continue;
           if (!trackIsInScope(track)) continue;
@@ -780,13 +794,14 @@ window.__ModuleLoader__.load({
         const { clientX, clientY } = event;
         cancelAnimationFrame(highlightId);
         highlightId = requestAnimationFrame(() => {
-          if (highlighted && highlighted !== target) clearHighlight(highlighted);
-          highlighted = target;
-          if (!target?.isConnected) return;
-          const rect = target.getBoundingClientRect();
-          target.style.setProperty('--hlg-x', (clientX - rect.left) + 'px');
-          target.style.setProperty('--hlg-y', (clientY - rect.top) + 'px');
-          target.setAttribute('data-hlg-hover', '');
+          const active = target?.isConnected && target.matches('[data-hlg-surface], [data-hlg-thumb]') ? target : null;
+          if (highlighted && highlighted !== active) clearHighlight(highlighted);
+          highlighted = active;
+          if (!active) return;
+          const rect = active.getBoundingClientRect();
+          active.style.setProperty('--hlg-x', (clientX - rect.left) + 'px');
+          active.style.setProperty('--hlg-y', (clientY - rect.top) + 'px');
+          active.setAttribute('data-hlg-hover', '');
         });
       }
       document.addEventListener('pointermove', point, { ...options, passive: true });

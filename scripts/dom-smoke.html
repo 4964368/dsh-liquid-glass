@@ -84,6 +84,17 @@
     document.body.dataset.liangStage = '4';
     assert(getComputedStyle(document.body).getPropertyValue('--hlg-base').trim() === '#e3e9f8', 'Liang dark rule escaped stage 5');
 
+    const composer = get('composer');
+    composer.hidden = true;
+    await Promise.resolve();
+    composer.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerType: 'mouse' }));
+    flushFrame();
+    assert(!composer.hasAttribute('data-hlg-surface'), 'Hidden composer kept its surface');
+    assert(!composer.hasAttribute('data-hlg-hover'), 'Queued pointer highlight survived surface release');
+    composer.hidden = false;
+    await Promise.resolve();
+    flushFrame();
+
     // Moving an existing track out of the app must release its lens and listeners.
     get('outside').append(track);
     await Promise.resolve();

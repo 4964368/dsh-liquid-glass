@@ -1,6 +1,6 @@
 {
   "name": "@wuren2/dsh-liquid-glass",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Liquid_Glass brings edge refraction and glass controls to DeepSeek Harness.",
   "license": "PolyForm-Noncommercial-1.0.0",
   "repository": {
@@ -54,18 +54,8 @@
       ]
     }
   },
-  "contributors": [
-    {
-      "name": "Claude",
-      "url": "https://github.com/anthropics/claude-code"
-    },
-    {
-      "name": "Codex",
-      "url": "https://github.com/openai/codex"
-    }
-  ],
   "engines": {
-    "dsh": "0.2.2-rc.1"
+    "dsh": "0.2.2-rc.3"
   },
   "scripts": {
     "check": "npm run check:syntax && npm run check:json && npm run check:css",
@@ -75,7 +65,7 @@
     "check:pack": "npm pack --dry-run --json --ignore-scripts | node scripts/check.js pack"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "4.1.0"
+    "@deepseek-ai/cordis": "^4.1.0"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": {
@@ -83,11 +73,11 @@
     }
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "4.1.0",
-    "@deepseek-ai/dsh-client-locale": "0.2.2-rc.1",
-    "@deepseek-ai/dsh-client-ui-conversation": "0.2.2-rc.1",
-    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.2-rc.1",
-    "@deepseek-ai/dsh-client-ui-settings": "0.2.2-rc.1",
-    "react": "^18.2.0"
+    "@deepseek-ai/cordis": "^4.1.0",
+    "@deepseek-ai/dsh-client-locale": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.2-rc.3",
+    "react": "^18.3.1"
   }
 }
