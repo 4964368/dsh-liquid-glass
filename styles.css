@@ -20,8 +20,12 @@ html[data-hlg] body {
   --hlg-blue: linear-gradient(180deg, #6a9eff, #3862ee);
   --hlg-user-bubble: #416bea;
   --hlg-ambient: rgb(104 140 229 / .13);
+  --hlg-ambient-rose: rgb(208 147 192 / .18);
+  --hlg-ambient-mint: rgb(111 186 178 / .13);
+  --hlg-ambient-light: rgb(255 255 255 / .40);
 }
 
+/* Liang controls the dark palette while its skin is active. */
 html[data-hlg] body:is([data-liang-skin="on"][data-liang-stage="5"], [data-ds-dark-theme]:not([data-liang-skin="on"])) {
   --hlg-base: #080b14;
   --hlg-ink: #f2f5fc;
@@ -38,6 +42,9 @@ html[data-hlg] body:is([data-liang-skin="on"][data-liang-stage="5"], [data-ds-da
   --hlg-accent: #7ea6ff;
   --hlg-user-bubble: #3258cb;
   --hlg-ambient: rgb(103 127 218 / .15);
+  --hlg-ambient-rose: rgb(148 95 176 / .17);
+  --hlg-ambient-mint: rgb(61 147 149 / .12);
+  --hlg-ambient-light: rgb(150 173 235 / .13);
 }
 
 html[data-hlg] :is([data-hlg-background], [data-hlg-surface]) {
@@ -81,13 +88,21 @@ html[data-hlg] [data-hlg-background] .liang-skin-backdrop[data-media="sequence"]
   opacity: .22;
 }
 
-html[data-hlg] [data-hlg-background]:not(:has(.liang-skin-backdrop[data-media="sequence"] img))::after {
+html[data-hlg] [data-hlg-background]::after {
   content: "";
   position: absolute;
   inset: var(--dsh-windows-titlebar-height, 0px) 0 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse at 14% 22%, var(--hlg-ambient), transparent 67%);
+  background:
+    radial-gradient(ellipse 36% 43% at 92% 16%, var(--hlg-ambient-rose), transparent),
+    radial-gradient(ellipse 41% 45% at 72% 8%, var(--hlg-ambient-light), transparent),
+    radial-gradient(ellipse 49% 56% at 14% 25%, var(--hlg-ambient), transparent),
+    radial-gradient(ellipse 51% 47% at 59% 89%, var(--hlg-ambient-mint), transparent);
+}
+
+html[data-hlg] body[data-liang-skin="on"] [data-hlg-background]:has(.liang-skin-backdrop[data-media="sequence"] img[src]:not([src=""]))::after {
+  content: none;
 }
 
 html[data-hlg] [data-hlg-background] > [class*="_centerCol"],
@@ -189,7 +204,7 @@ html[data-hlg] [data-hlg-surface="composer"] {
   transition: translate .5s var(--hlg-spring);
 }
 
-html[data-hlg] [data-hlg-surface="composer"][data-hlg-mode="lens"]:has([data-trigger-menu]),
+html[data-hlg] [data-hlg-surface="composer"][data-hlg-mode="lens"]:has([data-trigger-menu], [data-hlg-floating]),
 html[data-hlg] [data-hlg-surface="sidebar"]:is([data-hlg-mode="lens"], [data-hlg-mode="frost"]) {
   position: relative;
   isolation: isolate;
@@ -198,7 +213,7 @@ html[data-hlg] [data-hlg-surface="sidebar"]:is([data-hlg-mode="lens"], [data-hlg
 }
 
 /* Filtering only the paint layer leaves the native fixed titlebar toggle viewport-relative. */
-html[data-hlg] [data-hlg-surface="composer"][data-hlg-mode="lens"]:has([data-trigger-menu])::before,
+html[data-hlg] [data-hlg-surface="composer"][data-hlg-mode="lens"]:has([data-trigger-menu], [data-hlg-floating])::before,
 html[data-hlg] [data-hlg-surface="sidebar"]:is([data-hlg-mode="lens"], [data-hlg-mode="frost"])::before {
   content: "";
   position: absolute;
@@ -255,8 +270,25 @@ html[data-hlg] [data-hlg-surface="popover"][data-menu-material] {
   --dsw-menu-backdrop-filter: none;
 }
 
-html[data-hlg] [data-trigger-menu][data-hlg-mode="lens"] {
-  background-color: color-mix(in srgb, white var(--hlg-glass-tint), transparent);
+html[data-hlg] [data-hlg-floating][data-hlg-mode="lens"] {
+  --hlg-tint: 3%;
+  --dsw-menu-surface-fill: transparent;
+  --dsw-specific-menu: transparent;
+  --dsw-menu-backdrop-filter: none;
+  background-color: color-mix(in srgb, var(--hlg-material) var(--hlg-tint), transparent) !important;
+}
+
+html[data-hlg] [data-hlg-floating][data-hlg-mode="lens"][data-hlg-hover] {
+  --hlg-glint: .05;
+}
+
+/* Reuse Harness's material layer so submenu and tooltip descendants aren't inside the filter. */
+html[data-hlg] [data-hlg-surface="popover"][data-hlg-mode="lens"][data-menu-material]:has(> [aria-hidden="true"][class*="_material_"]) {
+  --dsw-menu-surface-fill: color-mix(in srgb, var(--hlg-material) var(--hlg-tint), transparent);
+  --dsw-menu-backdrop-filter: var(--hlg-surface-filter);
+  background-color: transparent !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 html[data-hlg] [data-hlg-surface="popover"][role="dialog"]::before {
@@ -339,6 +371,7 @@ html[data-hlg] [data-hlg-surface="composer"] button[class*="_primary"] {
   box-shadow: inset 0 1px 1px rgb(255 255 255 / .68), 0 5px 13px rgb(59 109 255 / .28);
 }
 
+/* Keep Liang's effort control above the glass only inside a glass composer. */
 html[data-hlg] [data-hlg-surface="composer"] .liang-effort-control {
   box-sizing: content-box;
   padding: 3px 10px;

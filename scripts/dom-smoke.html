@@ -1,0 +1,119 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Liquid_Glass DOM smoke test</title>
+<style>
+  .fixture { width: 180px; height: 32px; }
+</style>
+<div id="outside">
+  <div class="fixture" role="menu">
+    <div class="fixture"><input id="portal-range" type="range"></div>
+  </div>
+</div>
+<div id="app" class="fixture_frame">
+  <div data-shell-overlay></div>
+  <div id="composer" class="fixture" data-composer-card></div>
+  <div id="range-track" class="fixture"><input id="range" type="range"></div>
+  <div class="fixture liang-effort-control">
+    <input id="liang-range" class="liang-effort-control__range" type="range">
+    <div id="liang-menu" class="fixture" role="menu"></div>
+  </div>
+  <div class="fixture"><input id="preference" type="range" data-hlg-preference></div>
+  <div class="fixture dshwv-widget"><div id="whale-class" class="fixture" role="menu"></div></div>
+  <div id="dshwv-widget"><div id="whale-id" class="fixture" role="menu"></div></div>
+  <div id="other-dshwv-widget"><div id="ordinary-menu" class="fixture" role="menu"></div></div>
+  <div class="liang-skin-backdrop" data-media="sequence">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="">
+    <div id="wallpaper-menu" class="fixture" role="menu"></div>
+  </div>
+</div>
+<div id="outside-wallpaper" class="liang-skin-backdrop"></div>
+<pre id="result" data-status="pending"></pre>
+<script>
+  let plugin;
+  window.__ModuleLoader__ = { load({ factory }) { plugin = factory(() => ({})); } };
+</script>
+<script src="../client.js"></script>
+<script type="module">
+  const get = id => document.getElementById(id);
+  const result = get('result');
+  const app = get('app');
+  const track = get('range-track');
+  const effects = [];
+  const context = { effect(run) { effects.push(run()); }, inject() {} };
+  const frames = new Map();
+  let nextFrame = 0;
+  window.requestAnimationFrame = callback => {
+    const id = ++nextFrame;
+    frames.set(id, callback);
+    return id;
+  };
+  window.cancelAnimationFrame = id => frames.delete(id);
+
+  function flushFrame() {
+    for (const [id, callback] of [...frames]) {
+      if (frames.delete(id)) callback(performance.now());
+    }
+  }
+
+  function assert(condition, message) {
+    if (!condition) throw new Error(message);
+  }
+
+  function disable() {
+    while (effects.length) effects.pop()();
+  }
+
+  try {
+    plugin.apply(context);
+    flushFrame();
+    assert(get('composer').getAttribute('data-hlg-surface') === 'composer', 'Composer was not matched');
+    assert(get('ordinary-menu').getAttribute('data-hlg-surface') === 'popover', 'Non-prefix ID was excluded');
+    assert(get('range').hasAttribute('data-hlg-range'), 'Ordinary slider was not matched');
+    assert(get('portal-range').hasAttribute('data-hlg-range'), 'Slider in a glass portal was not matched');
+    for (const id of ['liang-menu', 'whale-class', 'whale-id', 'wallpaper-menu']) {
+      assert(!get(id).hasAttribute('data-hlg-surface'), `Surface escaped exclusion: ${id}`);
+    }
+    for (const id of ['liang-range', 'preference']) {
+      assert(!get(id).hasAttribute('data-hlg-range'), `Slider escaped exclusion: ${id}`);
+    }
+    assert(app.style.getPropertyValue('--hlg-wallpaper-image').includes('data:image/svg+xml'), 'Wallpaper source was not shared');
+    assert(getComputedStyle(get('outside-wallpaper')).position === 'static', 'Wallpaper rule escaped the app');
+    document.body.dataset.liangSkin = 'on';
+    document.body.dataset.liangStage = '5';
+    assert(getComputedStyle(document.body).getPropertyValue('--hlg-base').trim() === '#080b14', 'Liang dark stage was not matched');
+    document.body.dataset.liangStage = '4';
+    assert(getComputedStyle(document.body).getPropertyValue('--hlg-base').trim() === '#e3e9f8', 'Liang dark rule escaped stage 5');
+
+    // Moving an existing track out of the app must release its lens and listeners.
+    get('outside').append(track);
+    await Promise.resolve();
+    flushFrame();
+    assert(!track.querySelector('[data-hlg-thumb]') && !track.hasAttribute('data-hlg-track'), 'Moved slider kept its glass lens');
+    get('range').dispatchEvent(new Event('input'));
+    assert(frames.size === 0, 'Moved slider kept its input listener');
+    assert(get('portal-range').hasAttribute('data-hlg-range'), 'Glass portal lost its slider lens');
+    app.append(track);
+    await Promise.resolve();
+    flushFrame();
+    assert(track.querySelectorAll('[data-hlg-thumb]').length === 1, 'Restored track did not get one lens');
+
+    for (let cycle = 0; cycle < 2; cycle++) {
+      disable();
+      assert(frames.size === 0, 'Animation frame survived disposal');
+      assert(!document.querySelector('[data-hlg-styles], [data-hlg-thumb], [data-hlg-surface], [data-hlg-background], svg'), 'Plugin nodes or markers survived disposal');
+      assert(!document.documentElement.hasAttribute('data-hlg'), 'Root marker survived disposal');
+      plugin.apply(context);
+      flushFrame();
+      assert(document.querySelectorAll('[data-hlg-styles]').length === 1, 'Styles were duplicated');
+      assert(track.querySelectorAll('[data-hlg-thumb]').length === 1, 'Lens was duplicated');
+    }
+    disable();
+    result.dataset.status = 'pass';
+    result.textContent = 'Liquid_Glass DOM smoke test passed';
+  } catch (error) {
+    result.dataset.status = 'fail';
+    result.textContent = error.stack;
+  } finally {
+    disable();
+  }
+</script>
