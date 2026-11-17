@@ -1,5 +1,4 @@
-# Liquid_Glass for DeepSeek Harness
-
+# Liquid_Glass
 Liquid_Glass 是一个 DeepSeek Harness（DSH）客户端插件，为输入框、展开的侧栏和部分浮层添加玻璃边缘折射，为分段控件、开关和滑块添加弹簧透镜。分段控件可拖动选择。正文、代码和工具卡片使用实色，便于阅读。
 
 ## 兼容环境
