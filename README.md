@@ -1,6 +1,6 @@
 # Liquid_Glass for DeepSeek Harness
 
-Liquid_Glass 是一个 DeepSeek Harness（DSH）客户端插件，为输入框、展开的侧栏和部分浮层添加玻璃边缘折射，为分段控件、开关和滑块添加弹簧透镜。分段控件可拖动选择，原有点击和键盘操作保留。正文、代码和工具卡片使用实色，便于阅读。
+Liquid_Glass 是一个 DeepSeek Harness（DSH）客户端插件，为输入框、展开的侧栏和部分浮层添加玻璃边缘折射，为分段控件、开关和滑块添加弹簧透镜。分段控件可拖动选择。正文、代码和工具卡片使用实色，便于阅读。
 
 ## 兼容环境
 
@@ -26,7 +26,7 @@ Liquid_Glass 是一个 DeepSeek Harness（DSH）客户端插件，为输入框�
 
 ## 开发过程
 
-维护者提出设计与交互需求，使用 Anthropic Claude 辅助制作 HTML 视觉原型，再使用 OpenAI Codex 参考该原型适配 DSH。原型用于验证圆弧折射剖面、色散和弹簧动画，不随本包分发。`client.js` 是直接加载的客户端入口，含内嵌样式；`styles.css` 是供阅读的样式副本。本项目由维护者独立维护，与 Anthropic、OpenAI、Apple 和 DeepSeek 无隶属、赞助或认可关系。
+维护者提出设计与交互需求，使用 Anthropic Claude 辅助制作 HTMLDemo，再使用 OpenAI Codex 参考该Demo适配 DSH。Demo用于验证圆弧折射剖面、色散和弹簧动画。`client.js` 是直接加载的客户端入口，含内嵌样式；`styles.css` 是供阅读的样式副本。
 
 ## 许可证 / License
 
